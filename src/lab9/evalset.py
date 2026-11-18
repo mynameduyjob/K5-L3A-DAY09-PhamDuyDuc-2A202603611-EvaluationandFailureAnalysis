@@ -28,6 +28,15 @@ REQUIRED = ("item_id", "claim_id", "failure_modes", "provenance", "split", "eval
 
 
 FM_CODE = re.compile(r"FM-\d{2}")
+# Public matrix coverage, reviewed against the claim and expected ledger outcome.
+# A claim may exercise more than one observable failure mode.
+MATRIX_FAILURE_MODES = {
+    "T01": ["FM-01"], "T02": ["FM-03"], "T03": ["FM-04"],
+    "T04": ["FM-02"], "T05": ["FM-09", "FM-01"], "T06": ["FM-06"],
+    "T07": ["FM-02", "FM-05"], "T08": ["FM-08"], "T09": ["FM-02"],
+    "T10": ["FM-01"], "T11": ["FM-07"], "T12": ["FM-01"],
+    "T13": ["FM-05"], "T14": ["FM-04", "FM-07"],
+}
 
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -46,8 +55,7 @@ def build(source: Path = SOURCE) -> tuple[int, int]:
         items.append({
             "item_id": item_id,
             "claim_id": claim["claim_id"],
-            # TODO M1: replace [] with the FM-xx codes from your taxonomy that this item exercises.
-            "failure_modes": [],
+            "failure_modes": MATRIX_FAILURE_MODES.get(claim.get("matrix_id"), []),
             "provenance": {"source": "lab8_public", "matrix_id": claim.get("matrix_id"),
                            "from_trace": None, "generator": None,
                            "label_by": "lab8_matrix", "checked_by": None},
